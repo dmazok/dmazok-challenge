@@ -1,0 +1,9 @@
+POST http://localhost:8080/employees/add
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "John Smith",
+  "contractInfo": "John Smith contract info",
+  "age": 19
+}

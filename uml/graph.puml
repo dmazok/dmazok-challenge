@@ -1,0 +1,11 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+[*] --> ADDED
+
+ADDED --> IN_CHECK : CHECK
+IN_CHECK --> APPROVED : APPROVE
+IN_CHECK --> ADDED : REJECT
+APPROVED --> ACTIVE : ACTIVATE
+
+@enduml
