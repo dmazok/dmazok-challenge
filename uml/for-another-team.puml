@@ -1,0 +1,24 @@
+@startuml
+
+node "another-team-component" {
+  [SomeService]
+}
+
+node "service" {
+    [EmployeeService]
+    database "Employee Storage"
+}
+
+node "Kafka" {
+  [employee-info-for-another-team-topic]
+  [employee-add-topic]
+  [employee-change-state-topic]
+}
+
+[SomeService] - [employee-info-for-another-team-topic] : consume
+[EmployeeService] --> [employee-info-for-another-team-topic] : publish
+[EmployeeService] - [employee-add-topic] : consume
+[EmployeeService] - [employee-change-state-topic] : consume
+[EmployeeService] --> [Employee Storage] : save,\nupdate
+
+@enduml
