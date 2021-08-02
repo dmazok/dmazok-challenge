@@ -1,3 +1,7 @@
+High-level solution diagram:
+
+![""](uml/high-level.png "Title")
+
 I've implemented the following employee state flow:
 
 ![""](uml/graph.png "Title")

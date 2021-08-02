@@ -1,0 +1,32 @@
+@startuml
+
+actor "API Client"
+
+node "rest-api" {
+  [EmployeeController]
+  [ReactiveEmployeeService]
+}
+
+node "service" {
+    [EmployeeService]
+    database "Employee Storage"
+}
+
+node "Kafka" {
+  [employee-add-topic]
+  [employee-change-state-topic]
+  [employee-status-topic]
+}
+
+
+[API Client] --> [EmployeeController] : /employees/add, \n/employees/{id}/{event}
+[EmployeeController] --> [API Client] : /employees/{id}/status(SSE)
+[ReactiveEmployeeService] --> [employee-add-topic] : publish
+[ReactiveEmployeeService] --> [employee-change-state-topic] : publish
+[ReactiveEmployeeService] - [employee-status-topic] : consume
+[EmployeeService] - [employee-add-topic] : consume
+[EmployeeService] - [employee-change-state-topic] : consume
+[EmployeeService] --> [employee-status-topic] : publish
+[EmployeeService] --> [Employee Storage] : save,\nupdate
+
+@enduml
