@@ -60,7 +60,7 @@ public class ServiceIntegrationTests {
     private String changeEmployeeStateTopic;
 
     @Value("${com.pplflw.challenge.kafka.employee-status-topic}")
-    private String employeeStatusTopic; // todo: rename topics?
+    private String employeeStatusTopic;
 
     @BeforeAll
     static void start() {
@@ -73,6 +73,12 @@ public class ServiceIntegrationTests {
         kafka.stop();
     }
 
+    /**
+     * Tests both cases in one method to save a time and reduce code complexity.
+     *
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     @Test
     public void testAddEmployeeAndMultipleChangeState() throws ExecutionException, InterruptedException {
 
@@ -92,8 +98,6 @@ public class ServiceIntegrationTests {
         consumer.subscribe(Collections.singletonList(employeeStatusTopic));
 
         KafkaProducer<String, EmployeeAddEventDto> addEmployeeEventProducer = producer();
-
-        System.out.println("addEmployeeTopic: " + addEmployeeTopic);
 
         addEmployeeEventProducer.send(new ProducerRecord<>(addEmployeeTopic,
                 new EmployeeAddEventDto(createTestEmployee()))).get();

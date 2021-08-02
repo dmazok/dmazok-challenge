@@ -79,7 +79,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return stateMachine.sendEvent(Mono.just(MessageBuilder.withPayload(event).build()))
                 .map(eventResult -> {
 
-                    log.debug("State machine result for event {}: {}", event, eventResult); // TODO: just event?
+                    log.debug("State machine result for event {}: {}", event, eventResult);
 
                     employee.setState(stateMachine.getState().getId());
 
@@ -92,7 +92,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                         employeeStorage.updateEmployee(employee);
                     }
-
 
                     sendStatusEvent(employeeStatusEventDto);
 
@@ -117,16 +116,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public void sendStatusEvent(EmployeeStatusEventDto employeeStatusEventDto) {
-        log.debug("Sending event to Kafka: {}", employeeStatusEventDto);
+        log.debug("Sending employee-status event to Kafka: {}", employeeStatusEventDto);
 
         kafkaProducer.send(employeeStatusTopic, employeeStatusEventDto)
                 .doOnSuccess(voidSenderResult
                         ->
-                        log.info("Successfully sent event to Kafka: {}", employeeStatusEventDto))
+                        log.debug("Successfully sent employee-status event to Kafka: {}", employeeStatusEventDto))
                 .timeout(Duration.ofSeconds(timeoutInSeconds))
                 .doOnError(throwable
                         ->
-                        log.error("An exception occurred while sending employee event={} to Kafka: {}",
+                        log.error("An exception occurred while sending employee-status event={} to Kafka: {}",
                                 employeeStatusEventDto,
                                 throwable.getMessage()))
                 .subscribe();
@@ -134,7 +133,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @KafkaListener(topics = "${com.pplflw.challenge.kafka.employee-add-topic}", clientIdPrefix = "add")
     public void listenEmployeeAddEvents(EmployeeAddEventDto employeeAddEventDto) {
-        log.info("Received EmployeeAddEventDto message: {}", employeeAddEventDto);
+        log.debug("Received EmployeeAddEventDto message: {}", employeeAddEventDto);
 
         addEmployee(employeeAddEventDto);
     }
@@ -143,7 +142,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             clientIdPrefix = "change-state",
             errorHandler = "errorHandler")
     public void listenEmployeeChangeStateEvent(EmployeeChangeStateEventDto employeeChangeStateEventDto) {
-        log.info("Received EmployeeChangeStateEventDto message: {}", employeeChangeStateEventDto);
+        log.debug("Received EmployeeChangeStateEventDto message: {}", employeeChangeStateEventDto);
 
         changeEmployeeState(employeeChangeStateEventDto.getEmployeeId(), employeeChangeStateEventDto.getEvent());
     }
