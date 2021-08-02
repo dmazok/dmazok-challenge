@@ -18,7 +18,6 @@ node "Kafka" {
   [employee-status-topic]
 }
 
-
 [API Client] --> [EmployeeController] : /employees/add, \n/employees/{id}/{event}
 [EmployeeController] --> [API Client] : /employees/{id}/status(SSE)
 [ReactiveEmployeeService] --> [employee-add-topic] : publish

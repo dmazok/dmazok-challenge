@@ -1,3 +1,0 @@
-GET http://localhost:8080/employees/server-response
-#Accept: application/json
-#Content-Type: application/json
