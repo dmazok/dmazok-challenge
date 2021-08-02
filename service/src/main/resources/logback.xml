@@ -11,5 +11,4 @@
     </root>
     <logger name="com.pplflw.challenge" level="INFO"/>
     <logger name="org.apache.kafka" level="WARN"/>
-    <logger name="org.springframework.web" level="DEBUG"/>
 </configuration>

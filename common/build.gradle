@@ -6,7 +6,11 @@ plugins {
     id 'com.pplflw.challenge.java-library-conventions'
 }
 
+ext {
+    lombokVersion = "1.18.20"
+}
+
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 }
