@@ -115,7 +115,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return stateMachine;
     }
 
-    public void sendStatusEvent(EmployeeStatusEventDto employeeStatusEventDto) {
+    private void sendStatusEvent(EmployeeStatusEventDto employeeStatusEventDto) {
         log.debug("Sending employee-status event to Kafka: {}", employeeStatusEventDto);
 
         kafkaProducer.send(employeeStatusTopic, employeeStatusEventDto)
@@ -125,7 +125,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .timeout(Duration.ofSeconds(timeoutInSeconds))
                 .doOnError(throwable
                         ->
-                        log.error("An exception occurred while sending employee-status event={} to Kafka: {}",
+                        log.warn("An exception occurred while sending employee-status event={} to Kafka: {}",
                                 employeeStatusEventDto,
                                 throwable.getMessage()))
                 .subscribe();
