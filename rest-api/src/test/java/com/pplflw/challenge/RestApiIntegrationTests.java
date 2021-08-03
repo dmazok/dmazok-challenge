@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -65,6 +66,9 @@ public class RestApiIntegrationTests {
     static void afterAll() {
         kafka.stop();
     }
+
+    @TestConfiguration
+    public static class TestApplicationConfiguration {}
 
     @Test
     public void testAddEmployee() {

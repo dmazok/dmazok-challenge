@@ -6,9 +6,6 @@ import com.pplflw.challenge.dto.EmployeeChangeStateEventDto;
 import com.pplflw.challenge.dto.EmployeeStatusEventDto;
 import com.pplflw.challenge.statemachine.EmployeeEvent;
 import com.pplflw.challenge.statemachine.EmployeeState;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -16,7 +13,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.assertj.core.util.Lists;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
@@ -73,24 +69,15 @@ public class ServiceIntegrationTests {
         kafka.stop();
     }
 
+    @TestConfiguration
+    public static class TestApplicationConfiguration {
+    }
+
     /**
      * Tests both cases in one method to save a time and reduce code complexity.
-     *
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
     @Test
     public void testAddEmployeeAndMultipleChangeState() throws ExecutionException, InterruptedException {
-
-        AdminClient adminClient = AdminClient.create(ImmutableMap.of(
-                AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers()
-        ));
-
-        adminClient.createTopics(Lists.list(
-                new NewTopic(addEmployeeTopic, 1, (short) 1),
-                new NewTopic(changeEmployeeStateTopic, 1, (short) 1),
-                new NewTopic(employeeStatusTopic, 1, (short) 1)
-        ));
 
         Employee employee = createTestEmployee();
 

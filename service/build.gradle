@@ -25,7 +25,6 @@ repositories {
 ext {
     springStatemachineVersion = "3.0.1"
     testcontainersVersion = "1.15.3"
-    jacksonVersion = "2.12.3"
 }
 
 dependencies {
@@ -34,8 +33,6 @@ dependencies {
     implementation "org.springframework.statemachine:spring-statemachine-starter:${springStatemachineVersion}"
     implementation "org.springframework.kafka:spring-kafka"
     implementation "io.projectreactor.kafka:reactor-kafka"
-    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-    implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
     annotationProcessor "org.projectlombok:lombok"
     testImplementation("org.springframework.boot:spring-boot-starter-test")
             {
