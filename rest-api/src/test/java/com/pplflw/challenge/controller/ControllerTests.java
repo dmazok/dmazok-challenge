@@ -129,8 +129,6 @@ public class ControllerTests {
                         statusEventDto.getResult(),
                         employee.getId().toString(),
                         employee.getState().toString()));
-
-        verify(employeeService, times(1)).status(employee.getId());
     }
 
     private Employee createTestEmployee() {

@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class EmployeeServiceImplTest {
@@ -47,6 +47,9 @@ class EmployeeServiceImplTest {
 
         assertEquals(employee.getId(), savedEmployee.getId());
         assertEquals(EmployeeState.ADDED, savedEmployee.getState());
+
+        verify(employeeStorage, times(1)).updateEmployee(same(employee));
+        verify(kafkaProducer, times(1)).send(any(String.class), any(EmployeeStatusEventDto.class));
     }
 
     @Test
@@ -54,13 +57,18 @@ class EmployeeServiceImplTest {
 
         when(employeeStorage.updateEmployee(any(Employee.class))).thenThrow(RuntimeException.class);
 
-        assertThrows(RuntimeException.class, () -> employeeService.addEmployee(new EmployeeAddEventDto()));
+        assertThrows(RuntimeException.class, () -> employeeService.addEmployee(new EmployeeAddEventDto(createTestEmployee())));
+
+        verify(kafkaProducer, never()).send(any(String.class), any(EmployeeStatusEventDto.class));
     }
 
     @Test
     public void changeEmployeeStateThrowsEmployeeNotFoundException() {
         assertThrows(EmployeeNotFoundException.class,
                 () -> employeeService.changeEmployeeState(-1L, EmployeeEvent.CHECK));
+
+        verify(kafkaProducer, never()).send(any(String.class), any(EmployeeStatusEventDto.class));
+        verify(employeeStorage, never()).updateEmployee(any(Employee.class));
     }
 
     @Test
@@ -84,6 +92,9 @@ class EmployeeServiceImplTest {
         assertEquals(employeeStatusEventDto.getEmployee().getId(), savedEmployee.getId());
         assertEquals(employeeStatusEventDto.getEmployee().getState(), EmployeeState.IN_CHECK);
         assertEquals(employeeStatusEventDto.getResult(), "ACCEPTED");
+
+        verify(kafkaProducer, times(2)).send(any(String.class), any(EmployeeStatusEventDto.class));
+        verify(employeeStorage, times(2)).updateEmployee(any(Employee.class));
     }
 
     @Test
@@ -107,6 +118,23 @@ class EmployeeServiceImplTest {
         assertEquals(employeeStatusEventDto.getEmployee().getId(), savedEmployee.getId());
         assertEquals(employeeStatusEventDto.getEmployee().getState(), EmployeeState.ADDED);
         assertEquals(employeeStatusEventDto.getResult(), "DENIED");
+
+        verify(kafkaProducer, times(2)).send(any(String.class), any(EmployeeStatusEventDto.class));
+        verify(employeeStorage, times(1)).updateEmployee(eq(employee));
+    }
+
+    @Test
+    public void changeEmployeeStateThrows() {
+
+        Employee employee = createTestEmployee();
+
+        when(kafkaProducer.send(any(String.class), any(EmployeeStatusEventDto.class))).thenReturn(Mono.empty());
+        when(employeeStorage.getEmployee(any(Long.class))).thenReturn(Optional.of(employee));
+        when(employeeStorage.updateEmployee(any(Employee.class))).thenThrow(RuntimeException.class);
+
+        assertThrows(RuntimeException.class, () -> employeeService.changeEmployeeState(employee.getId(), EmployeeEvent.CHECK));
+
+        verify(kafkaProducer, never()).send(any(String.class), any(EmployeeStatusEventDto.class));
     }
 
     private Employee createTestEmployee() {
